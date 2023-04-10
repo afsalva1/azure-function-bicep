@@ -1,0 +1,25 @@
+param environment string
+
+resource rg_enterpriseservices 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: 'AM-Enterpriseservices-${environment}'
+  location: 'eastus'
+}
+
+resource app_service_plan 'Microsoft.Web/serverfarms@2021-02-01' = {
+  name: 'app-service-plan'
+  location: rg_enterpriseservices.location
+  kind: 'functionapp'
+  sku: {
+    name: 'Y1'
+    tier: 'Dynamic'
+  }
+}
+
+resource function_app 'Microsoft.Web/sites@2021-02-01' = {
+  name: 'margin-commit-fulfillment-processor'
+  location: rg_enterpriseservices.location
+  kind: 'functionapp'
+  properties: {
+    serverFarmId: app_service_plan.id
+  }
+}
